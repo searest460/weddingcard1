@@ -1,4 +1,4 @@
-# Ultra-robust setup script (No BOM, Escaped Newlines)
+# Perfection setup script - Final Version
 $root = "c:\Users\Rahuldev\Downloads\theatre_demo.thedigitalyes.com"
 $jsPath = "$root\assets\index-BBIwAgSn.js"
 $cssPath = "$root\assets\index-bYuRLTYZ.css"
@@ -18,21 +18,28 @@ function Escape-JSString($s) {
     return $s.ToString().Replace('\', '\\').Replace('"', '\"').Replace("`n", '\n').Replace("`r", '')
 }
 
-# Names
+# 1. Names - All variations
 $c = $c.Replace('Matthias', 'Rahul')
 $c = $c.Replace('Flora', 'Dhanya')
 $c = $c.Replace('Sofia', 'Dhanya')
 $c = $c.Replace('Sofía', 'Dhanya')
 $c = $c.Replace('Sam', 'Rahul')
+$c = $c.Replace('SAM', 'RAHUL')
+$c = $c.Replace('SOFIA', 'DHANYA')
 
-# Dates & Venue
+# 2. Dates - Including the scratch card array
+$c = $c.Replace('["10","Sept","2027"]', '["13","Sept","2026"]')
 $c = $c.Replace('September 10, 2027', 'September 13, 2026')
-$c = $c.Replace('Villa Medicea di Artimino', (Escape-JSString $en.'transport.description'))
-$c = $c.Replace('Via di Papa Leone X, 28', '')
-$c = $c.Replace('Artimino, Florencia', '')
 $c = $c.Replace('2026-09-06', '2026-09-13')
+$c = $c.Replace('20260904/20260907', '20260913/20260914')
 
-# Translations
+# 3. Venue - All parts
+$c = $c.Replace('Villa Medicea di Artimino', 'Akhil Convention Centre')
+$c = $c.Replace('Via di Papa Leone X, 28', 'Shankaramangalam Koyivila Rd')
+$c = $c.Replace('Artimino, Florencia', 'Thevalakkara, Kerala')
+$c = $c.Replace('Moutiers-Sainte-Marie, France', 'Kollam, Kerala')
+
+# 4. Inject main translations (aggressive replacement of keys)
 $c = $c.Replace('s("demo.title")', '"' + (Escape-JSString $en.'intro.invitation') + '"')
 $c = $c.Replace('s("demo.buyNow")', '"' + (Escape-JSString $en.'intro.personalMessage') + '"')
 $c = $c.Replace('e("dressCode.title")', '"' + (Escape-JSString $en.'dressCode.title') + '"')
@@ -48,7 +55,19 @@ $c = $c.Replace('e("transport.howToGet")', '"' + (Escape-JSString $en.'transport
 $c = $c.Replace('e("transport.departure")', '"' + (Escape-JSString $en.'transport.departure') + '"')
 $c = $c.Replace('e("transport.rsvpNote")', '"' + (Escape-JSString $en.'transport.rsvpNote') + '"')
 
-# Save files using original names, UTF-8 WITHOUT BOM
+# 5. RSVP Sections (jV and IV objects)
+$c = $c.Replace('thankYou:"Confirm your attendance"', 'thankYou:"' + (Escape-JSString $en.'rsvp.title') + '"')
+$c = $c.Replace('thankYouConfirming:"Thank you for confirming"', 'thankYouConfirming:"' + (Escape-JSString $en.'rsvp.title') + '"')
+$c = $c.Replace('fullName:"Full name *"', 'fullName:"' + (Escape-JSString $en.'rsvp.fullName') + '"')
+$c = $c.Replace('willAttend:"Will you attend?"', 'willAttend:"' + (Escape-JSString $en.'rsvp.willAttend') + '"')
+$c = $c.Replace('yes:"I''ll be there!"', 'yes:"' + (Escape-JSString $en.'rsvp.yesButton') + '"')
+$c = $c.Replace('no:"Can''t make it"', 'no:"' + (Escape-JSString $en.'rsvp.noButton') + '"')
+$c = $c.Replace('guestCount:"Number of guests"', 'guestCount:"' + (Escape-JSString $en.'rsvp.guestCount') + '"')
+$c = $c.Replace('dietaryTitle:"Dietary requirements"', 'dietaryTitle:"' + (Escape-JSString $en.'rsvp.dietary') + '"')
+$c = $c.Replace('sending:"Sending..."', 'sending:"' + (Escape-JSString $en.'rsvp.sending') + '"')
+$c = $c.Replace('send:"Confirm"', 'send:"' + (Escape-JSString $en.'rsvp.send') + '"')
+
+# Save files using UTF-8 WITHOUT BOM
 $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 [System.IO.File]::WriteAllText($jsPath, $c, $Utf8NoBomEncoding)
 
