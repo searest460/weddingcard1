@@ -1,40 +1,41 @@
+# Simple robust server
+$port = 8088
 $listener = New-Object System.Net.HttpListener
-$listener.Prefixes.Add('http://localhost:8084/')
+$listener.Prefixes.Add("http://localhost:$port/")
 $listener.Start()
-Write-Host "Listening on http://localhost:8084"
-try {
-    while ($listener.IsListening) {
+Write-Host "Listening on http://localhost:$port"
+
+while ($true) {
+    try {
         $context = $listener.GetContext()
         $request = $context.Request
         $response = $context.Response
+        
         $path = $request.Url.LocalPath.TrimStart('/')
         if ($path -eq '') { $path = 'index.html' }
         $fullPath = Join-Path $PWD $path
         
-        Write-Host "Requested: $path"
-
         if (Test-Path $fullPath -PathType Leaf) {
-            $content = [System.IO.File]::ReadAllBytes($fullPath)
-            $response.ContentLength64 = $content.Length
-            
-            if ($path.EndsWith('.js')) { $response.ContentType = 'application/javascript' }
-            elseif ($path.EndsWith('.css')) { $response.ContentType = 'text/css' }
-            elseif ($path.EndsWith('.html')) { $response.ContentType = 'text/html' }
-            elseif ($path.EndsWith('.png')) { $response.ContentType = 'image/png' }
-            elseif ($path.EndsWith('.jpg') -or $path.EndsWith('.jpeg')) { $response.ContentType = 'image/jpeg' }
-            
-            $response.OutputStream.Write($content, 0, $content.Length)
-            Write-Host "Served: $fullPath"
+            $extension = [System.IO.Path]::GetExtension($fullPath)
+            $contentType = switch ($extension) {
+                '.html' { 'text/html' }
+                '.js'   { 'application/javascript' }
+                '.css'  { 'text/css' }
+                '.png'  { 'image/png' }
+                '.jpg'  { 'image/jpeg' }
+                '.svg'  { 'image/svg+xml' }
+                '.mp4'  { 'video/mp4' }
+                default { 'application/octet-stream' }
+            }
+            $response.ContentType = $contentType
+            $buffer = [System.IO.File]::ReadAllBytes($fullPath)
+            $response.ContentLength64 = $buffer.Length
+            $response.OutputStream.Write($buffer, 0, $buffer.Length)
         } else {
             $response.StatusCode = 404
-            Write-Host "Not Found: $fullPath"
         }
         $response.Close()
+    } catch {
+        Write-Host "Request error: $_"
     }
-}
-catch {
-    Write-Host "Error: $_"
-}
-finally {
-    $listener.Stop()
 }
