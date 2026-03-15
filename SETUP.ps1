@@ -1,4 +1,4 @@
-# Absolute perfection setup script - v2
+# Absolute perfection setup script - v3
 $root = "c:\Users\Rahuldev\Downloads\theatre_demo.thedigitalyes.com"
 $jsPath = "$root\assets\index-BBIwAgSn.js"
 $cssPath = "$root\assets\index-bYuRLTYZ.css"
@@ -18,7 +18,7 @@ function Escape-JSString($s) {
     return $s.ToString().Replace('\', '\\').Replace('"', '\"').Replace("`n", '\n').Replace("`r", '')
 }
 
-# 1. Names - Global
+# 1. Names - Global & Aggressive
 $c = $c.Replace('Matthias', 'Rahul')
 $c = $c.Replace('Flora', 'Dhanya')
 $c = $c.Replace('Sofia', 'Dhanya')
@@ -26,6 +26,12 @@ $c = $c.Replace('Sofía', 'Dhanya')
 $c = $c.Replace('Sam', 'Rahul')
 $c = $c.Replace('SAM', 'RAHUL')
 $c = $c.Replace('SOFIA', 'DHANYA')
+
+# Aggressive encoded replacements
+$c = $c -replace 'Sof\\u00EDa', 'Dhanya'
+$c = $c -replace 'Sof\\xEDa', 'Dhanya'
+$c = $c -replace '"Sofía"', '"Dhanya"'
+$c = $c -replace '"Sofia"', '"Dhanya"'
 
 # 2. Dates & Countdown
 $c = $c.Replace('["10","Sept","2027"]', '["13","Sept","2026"]')
@@ -40,19 +46,15 @@ $c = $c.Replace('Via di Papa Leone X, 28', 'Shankaramangalam Koyivila Rd')
 $c = $c.Replace('Artimino, Florencia', 'Thevalakkara, Kerala')
 $c = $c.Replace('Moutiers-Sainte-Marie, France', 'Kollam, Kerala')
 
-# 4. Remove Extra Badge (marked in screenshot)
-# We'll replace the badge component with null. 
-# The badge is identified by its style and the e("saveTheDate.extraBadge") call.
+# 4. Remove Extra Badge
 $badgePattern = 'f\.jsx\(z\.div,\{initial:\{opacity:0,scale:\.8\},whileInView:\{opacity:1,scale:1\},transition:\{duration:\.5,delay:\.6\},viewport:\{once:!0\},className:"absolute -top-2 -right-2 md:top-0 md:right-0 z-10",children:f\.jsx\("div",\{className:"px-3 py-1\.5 rounded-full shadow-md text-center",style:\{backgroundColor:"#5C2018",maxWidth:"140px"\},children:f\.jsx\("span",\{className:"font-body text-\[9px\] md:text-\[10px\] tracking-wide text-white leading-tight block",children:e\("saveTheDate\.extraBadge"\)\}\)\}\)\}\)'
 $c = $c -replace $badgePattern, 'null'
 
-# 5. Remove "Please avoid wearing white" (marked in screenshot)
-# This matches the paragraph in the Dress Code section.
+# 5. Remove "Please avoid wearing white"
 $avoidWhitePattern = 'f\.jsx\(z\.div,\{initial:\{opacity:0,y:30\},whileInView:\{opacity:1,y:0\},transition:\{duration:\.8,ease:"easeOut",delay:.8\},viewport:\{once:!0\},className:"text-center",children:f\.jsx\("p",\{className:"font-script text-2xl md:text-3xl",style:\{color:"#5C2018"\},children:e\("dressCode\.avoidWhite"\)\}\)\}\)'
 $c = $c -replace $avoidWhitePattern, 'null'
 
-# 6. Replace Menu with Wedding Events (marked in screenshot)
-# We'll replace the entire children array of the menu container.
+# 6. Replace Menu with Wedding Events
 $eventsHtml = @"
 f.jsxs("div",{className:"space-y-8 py-4",children:[
     f.jsxs("div",{className:"text-center",children:[
@@ -73,8 +75,6 @@ f.jsxs("div",{className:"space-y-8 py-4",children:[
 ]})
 "@
 $eventsHtml = $eventsHtml.Replace("`r`n", "").Replace("    ", "")
-
-# This matches the specific children structure of the Italian menu
 $menuChildrenPattern = 'f\.jsxs\("div",\{className:"space-y-8",children:\[f\.jsxs\(z\.div,\{initial:\{opacity:0,y:10\},whileInView:\{opacity:1,y:0\},transition:\{duration:\.5,delay:\.4\},viewport:\{once:!0\},className:"text-center",children:\[f\.jsx\("h3",\{className:"font-display text-xs md:text-sm tracking-\[0\.2em\] uppercase mb-1",style:\{color:"#5C2018"\},children:"Aperitivo"\}[\s\S]*?\}\)\]\}\)\]\}\)'
 $c = $c -replace $menuChildrenPattern, $eventsHtml
 
@@ -102,7 +102,7 @@ $c = $c.Replace('dietaryTitle:"Dietary requirements"', 'dietaryTitle:"' + (Escap
 $c = $c.Replace('sending:"Sending..."', 'sending:"' + (Escape-JSString $en.'rsvp.sending') + '"')
 $c = $c.Replace('send:"Confirm"', 'send:"' + (Escape-JSString $en.'rsvp.send') + '"')
 
-# 9. Header & Switcher (Keep them removed as per previous request)
+# 9. Header & Switcher (Keep them removed)
 $c = $c.Replace('f.jsxs("main",{className:"bg-white",children:[f.jsx(FV,{}),f.jsx(VV,{}),', 'f.jsxs("main",{className:"bg-white",children:[null,null,')
 $c = $c.Replace('f.jsx($$,{}),f.jsx(V$,{}),', 'f.jsx($$,{}),null,')
 
