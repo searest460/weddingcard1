@@ -10,15 +10,14 @@ $translationsPath = "$root\translations.json"
 # ------------------------------------------------------------
 # STEP 1: Download fresh original JS bundle
 # ------------------------------------------------------------
-Write-Host "[1/4] Downloading original JS bundle..."
-Invoke-WebRequest -Uri "https://theatre-demo.thedigitalyes.com/assets/index-BBIwAgSn.js" -OutFile $jsPath
+Write-Host "[1/4] Loading original JS bundle..."
+$c = [System.IO.File]::ReadAllText("$root\original_clean.js", [System.Text.Encoding]::UTF8)
 Write-Host "      Done."
 
 # ------------------------------------------------------------
-# STEP 2: Load the bundle and translations
+# STEP 2: Load translations
 # ------------------------------------------------------------
 Write-Host "[2/4] Loading files..."
-$c = [System.IO.File]::ReadAllText($jsPath, [System.Text.Encoding]::UTF8)
 $transJson = [System.IO.File]::ReadAllText($translationsPath, [System.Text.Encoding]::UTF8)
 
 # ------------------------------------------------------------
@@ -130,15 +129,9 @@ $replacement = $newLocTrans + "," + "kg="
 $c = [regex]::Replace($c, $pattern, $replacement)
 
 # ------------------------------------------------------------
-# STEP 4: Save the bundle
+# STEP 4: Define index.html
 # ------------------------------------------------------------
-[System.IO.File]::WriteAllText($jsPath, $c, [System.Text.Encoding]::UTF8)
-Write-Host "      Done."
-
-# ------------------------------------------------------------
-# STEP 5: Write the final index.html
-# ------------------------------------------------------------
-Write-Host "[4/4] Writing index.html..."
+Write-Host "[4/4] Preparing index.html..."
 $html = @"
 <!doctype html>
 <html lang="en">
@@ -178,6 +171,8 @@ $html = @"
 </body>
 </html>
 "@
+# 5. Write the final files
+[System.IO.File]::WriteAllText($jsPath, $c, [System.Text.Encoding]::UTF8)
 [System.IO.File]::WriteAllText("$root\index.html", $html, [System.Text.Encoding]::UTF8)
 Write-Host "      Done."
 Write-Host ""
