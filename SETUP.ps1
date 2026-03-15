@@ -1,4 +1,4 @@
-# Perfect setup script with mapping
+# Final perfect setup script with mapping
 $root = "c:\Users\Rahuldev\Downloads\theatre_demo.thedigitalyes.com"
 $jsPath = "$root\assets\index-v2.js"
 $cssPath = "$root\assets\index-v2.css"
@@ -12,6 +12,18 @@ $transObj = $translations | ConvertFrom-Json
 $en = $transObj.en
 
 Write-Host "[2/4] Mapping translations to JS keys..."
+
+# Update couple names everywhere
+$c = $c -replace 'couple_name_1\)\|\|"Matthias"', ('couple_name_1)||"Rahul"')
+$c = $c -replace 'couple_name_2\)\|\|"Flora"', ('couple_name_2)||"Dhanya"')
+$c = $c.Replace('children:"Matthias"', 'children:"Rahul"')
+$c = $c.Replace('children:"Flora"', 'children:"Dhanya"')
+
+# Update Venue
+$c = $c.Replace('children:"Villa Medicea di Artimino"', ('children:"' + $en.'transport.description' + '"'))
+$c = $c.Replace('children:"Via di Papa Leone X, 28"', 'children:""')
+$c = $c.Replace('children:"Artimino, Florencia"', 'children:""')
+$c = $c.Replace('children:"September 10, 2027"', 'children:"September 13, 2026"')
 
 # Update jV object (RSVP confirmation)
 $c = $c -replace 'thankYou:"Thank you"', ('thankYou:"' + $en.'rsvp.title' + '"')
@@ -32,15 +44,6 @@ $c = $c -replace 'messagePlaceholder:".*?"', ('messagePlaceholder:"' + $en.'rsvp
 $c = $c -replace 'sending:"Sending\.\.\."', ('sending:"' + $en.'rsvp.sending' + '"')
 $c = $c -replace 'send:"Confirm"', ('send:"' + $en.'rsvp.send' + '"')
 
-# Update other hardcoded strings
-$c = $c.Replace('Matthias', 'Rahul')
-$c = $c.Replace('Flora', 'Dhanya')
-$c = $c.Replace('September 4-6', 'September 13')
-$c = $c.Replace('2026-09-06', '2026-09-13')
-$c = $c.Replace('20260904/20260907', '20260913/20260914')
-$c = $c.Replace('Monastère de Ségries', $en.'transport.description')
-$c = $c.Replace('Moutiers-Sainte-Marie, France', '')
-
 # Global name replacement with word boundaries
 $c = $c -replace '\bSofia\b', 'Dhanya'
 $c = $c -replace '\bSofía\b', 'Dhanya'
@@ -50,11 +53,6 @@ $c = $c -replace '\bSam\b', 'Rahul'
 $c = $c -replace '\bSAM\b', 'RAHUL'
 
 Write-Host "[3/4] Injecting main translations..."
-# The main translations object used by s("key")
-# Since we couldn't find a single big object, we'll try to replace individual s("...") calls
-# OR we can try to find where the language state is initialized and inject our object there.
-# But replacing the s("...") results is safer if we know the keys.
-
 $c = $c.Replace('s("demo.title")', '"' + $en.'intro.invitation' + '"')
 $c = $c.Replace('s("demo.buyNow")', '"' + $en.'intro.personalMessage' + '"')
 $c = $c.Replace('e("dressCode.title")', '"' + $en.'dressCode.title' + '"')
@@ -67,7 +65,7 @@ $c = $c.Replace('e("gifts.concept")', '"' + $en.'gifts.concept' + '"')
 $c = $c.Replace('e("transport.title")', '"' + $en.'transport.title' + '"')
 $c = $c.Replace('e("transport.description")', '"' + $en.'transport.description' + '"')
 $c = $c.Replace('e("transport.howToGet")', '"' + $en.'transport.howToGet' + '"')
-$c = $c.Replace('e("transport.departure")', '"' + $en.'transport.howToGet' + '"') # fallback
+$c = $c.Replace('e("transport.departure")', '"' + $en.'transport.departure' + '"')
 $c = $c.Replace('e("transport.rsvpNote")', '"' + $en.'transport.rsvpNote' + '"')
 
 Write-Host "[4/4] Saving files..."
