@@ -1,14 +1,14 @@
 $listener = New-Object System.Net.HttpListener
-$listener.Prefixes.Add('http://localhost:8081/')
+$listener.Prefixes.Add('http://localhost:8083/')
 $listener.Start()
-Write-Host "Listening on http://localhost:8081"
+Write-Host "Listening on http://localhost:8083"
 try {
     while ($listener.IsListening) {
         $context = $listener.GetContext()
         $request = $context.Request
         $response = $context.Response
         $path = $request.Url.LocalPath.TrimStart('/')
-        if ($path -eq '' -or $path -eq 'theatre-demo.thedigitalyes.com/') { $path = 'index.html' }
+        if ($path -eq '') { $path = 'index.html' }
         $fullPath = Join-Path $PWD $path
         
         Write-Host "Requested: $path"

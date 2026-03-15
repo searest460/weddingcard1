@@ -67,6 +67,11 @@ $c = $c.Replace('N$=()=>{', $welcomeCarousel + 'N$=()=>{')
 # Inject W$ into main children between N$ and I$
 $c = $c.Replace('f.jsx(N$,{}),f.jsx(I$,{})', 'f.jsx(N$,{}),f.jsx(W$,{}),f.jsx(I$,{})')
 
+# 4. Remove loading screen once React curtain is ready
+# (We handle this via window.onload in index.html instead of patching JS)
+
+# 5. Write the final index.html
+
 $badgePattern = 'f.jsx(z.div,{initial:{opacity:0,scale:.8},whileInView:{opacity:1,scale:1},transition:{duration:.5,delay:.6},viewport:{once:!0},className:"absolute -top-2 -right-2 md:top-0 md:right-0 z-10",children:f.jsx("div",{className:"px-3 py-1.5 rounded-full shadow-md text-center",style:{backgroundColor:"#5C2018",maxWidth:"140px"},children:f.jsx("span",{className:"font-body text-[9px] md:text-[10px] tracking-wide text-white leading-tight block",children:e("saveTheDate.extraBadge")})})})'
 $c = $c.Replace($badgePattern, 'null')
 
@@ -147,18 +152,29 @@ $html = @"
   <link rel="stylesheet" crossorigin href="./assets/index-bYuRLTYZ.css">
 </head>
 <body>
-  <div id="root">
-    <div id="initial-loader" style="position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 9999;">
-      <img src="./assets/curtain-closed-Bpkadld4.jpg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.5;" />
-      <div style="position: relative; text-align: center; color: white;">
-        <div style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-        <p style="font-family: serif; letter-spacing: 4px; font-size: 14px; text-transform: uppercase;">Loading Invitation</p>
-      </div>
+  <div id="root"></div>
+  <div id="initial-loader" style="position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 9999;">
+    <img src="./assets/curtain-closed-Bpkadld4.jpg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.5;" />
+    <div style="position: relative; text-align: center; color: white;">
+      <div style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+      <p style="font-family: serif; letter-spacing: 4px; font-size: 14px; text-transform: uppercase;">Loading Invitation</p>
     </div>
-    <style>
-      @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
   </div>
+  <script>
+    window.addEventListener('load', function() {
+      var loader = document.getElementById('initial-loader');
+      if (loader) {
+        setTimeout(function() {
+          loader.style.opacity = '0';
+          loader.style.transition = 'opacity 0.5s ease';
+          setTimeout(function() { loader.remove(); }, 500);
+        }, 500);
+      }
+    });
+  </script>
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </body>
 </html>
 "@
