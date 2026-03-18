@@ -63,19 +63,24 @@ $c = $c -replace $avoidWhitePattern, 'null'
 $eventsHtml = @"
 f.jsxs("div",{className:"space-y-8 py-4",children:[
     f.jsxs("div",{className:"text-center",children:[
-        f.jsx("h3",{className:"font-display text-sm tracking-widest uppercase mb-1",style:{color:"#5C2018"},children:"Mehndi"}),
-        f.jsx("p",{className:"font-body text-xs",style:{color:"#5C2018"},children:"September 11, 2026 | 3:00 PM"}),
-        f.jsx("p",{className:"font-body text-[10px] italic",style:{color:"#5C2018"},children:"Akhil Convention Centre"})
+        f.jsx("h3",{className:"font-display text-sm tracking-widest uppercase mb-1",style:{color:"#5C2018"},children:"Rang Jo Lagyo — “Mehendi”"}),
+        f.jsx("p",{className:"font-body text-xs",style:{color:"#5C2018"},children:"Malepurath House"}),
+        f.jsx("p",{className:"font-body text-[10px] italic",style:{color:"#5C2018"},children:"11th September 2026 • 3:00 PM"})
     ]}),
     f.jsxs("div",{className:"text-center",children:[
-        f.jsx("h3",{className:"font-display text-sm tracking-widest uppercase mb-1",style:{color:"#5C2018"},children:"Pudava & Sangeet"}),
-        f.jsx("p",{className:"font-body text-xs",style:{color:"#5C2018"},children:"September 12, 2026 | 5:00 PM"}),
-        f.jsx("p",{className:"font-body text-[10px] italic",style:{color:"#5C2018"},children:"Akhil Convention Centre"})
+        f.jsx("h3",{className:"font-display text-sm tracking-widest uppercase mb-1",style:{color:"#5C2018"},children:"Tal Se Taal Mila — “Podva & Sangeet”"}),
+        f.jsx("p",{className:"font-body text-xs",style:{color:"#5C2018"},children:"Malepurath House"}),
+        f.jsx("p",{className:"font-body text-[10px] italic",style:{color:"#5C2018"},children:"12th September 2026 • 5:00 PM"})
     ]}),
     f.jsxs("div",{className:"text-center",children:[
-        f.jsx("h3",{className:"font-display text-sm tracking-widest uppercase mb-1",style:{color:"#5C2018"},children:"Wedding (Saat Phere)"}),
-        f.jsx("p",{className:"font-body text-xs",style:{color:"#5C2018"},children:"September 13, 2026 | 10:00 AM"}),
-        f.jsx("p",{className:"font-body text-[10px] italic",style:{color:"#5C2018"},children:"Akhil Convention Centre"})
+        f.jsx("h3",{className:"font-display text-sm tracking-widest uppercase mb-1",style:{color:"#5C2018"},children:"Saat Phere — “Wedding”"}),
+        f.jsx("p",{className:"font-body text-xs",style:{color:"#5C2018"},children:"Akhil Convention Centre"}),
+        f.jsx("p",{className:"font-body text-[10px] italic",style:{color:"#5C2018"},children:"13th September 2026 • 10:00 AM"})
+    ]}),
+    f.jsxs("div",{className:"text-center",children:[
+        f.jsx("h3",{className:"font-display text-sm tracking-widest uppercase mb-1",style:{color:"#5C2018"},children:"Reception"}),
+        f.jsx("p",{className:"font-body text-xs",style:{color:"#5C2018"},children:"Kollam, Kerala"}),
+        f.jsx("p",{className:"font-body text-[10px] italic",style:{color:"#5C2018"},children:"13th September 2026 • 5:00 PM"})
     ]})
 ]})
 "@
