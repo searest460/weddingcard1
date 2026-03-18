@@ -40,19 +40,29 @@
           findByText(document.body,'Dolce')
         ].filter(Boolean);
         if(anchors.length===0) return;
+
         // Choose a reference element
         var ref=anchors[0];
-        // Climb up to a compact container that holds the menu block
-        var container=ref;
-        for(var i=0;i<6 && container; i++){
-          var t=(container.textContent||'').toLowerCase();
-          var score=0;
-          ['aperitivo','primo','secondo','dolce','vini della tenuta','bruschetta','risotto','filetto'].forEach(k=>{ if(t.indexOf(k)>-1) score++; });
-          if(score>=3) break;
-          container=container.parentElement;
+
+        // Find the smallest "card-like" container that contains the menu text,
+        // but never escalate to <main>, <body>, <html>, or #root
+        function findMenuCard(node){
+          var needles=['aperitivo','primo','secondo','dolce','vini della tenuta','bruschetta','risotto','filetto'];
+          var cur=node;
+          for(var d=0; d<6 && cur; d++){
+            var tag=(cur.tagName||'').toLowerCase();
+            if(tag==='body'||tag==='main'||tag==='html'||(cur.id||'')==='root') return null;
+            var txt=(cur.textContent||'').toLowerCase();
+            var hits=0; for(var i=0;i<needles.length;i++){ if(txt.indexOf(needles[i])>-1) hits++; }
+            // Prefer compact nodes (to avoid replacing big sections)
+            if(hits>=3 && txt.length<1200) return cur;
+            cur=cur.parentElement;
+          }
+          return null;
         }
-        if(!container) return;
-        if(container.getAttribute && container.getAttribute('data-events-injected')==='1') return;
+        var menuCard=findMenuCard(ref);
+        if(!menuCard) return;
+        if(menuCard.getAttribute && menuCard.getAttribute('data-events-injected')==='1') return;
 
         // Build events markup
         var html=[
@@ -86,9 +96,13 @@
           '</div>'
         ].join('');
 
-        // Replace the menu container content directly
-        container.setAttribute && container.setAttribute('data-events-injected','1');
-        container.innerHTML=html;
+        // Insert events block BEFORE the menu card and hide only that card
+        var wrapper=document.createElement('div');
+        wrapper.className='space-y-4 py-4';
+        wrapper.innerHTML=html;
+        menuCard.parentElement&&menuCard.parentElement.insertBefore(wrapper,menuCard);
+        menuCard.style&&(menuCard.style.display='none');
+        menuCard.setAttribute&&menuCard.setAttribute('data-events-injected','1');
       }
       function sweep(root){
         if(!root) return;
