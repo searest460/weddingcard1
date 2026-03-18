@@ -9,5 +9,71 @@
 </head>
 <body>
   <div id="root"></div>
+  <script>
+    (function(){
+      function replaceInTextNode(n){
+        if(!n||!n.nodeValue) return;
+        var s=n.nodeValue, r=s;
+        r=r.replace(/Rahul\s*&\s*Sof(?:i\u00ED|í|ia|ía|Ã\u00eda)/g,'Rahul & Dhanya');
+        r=r.replace(/Sof(?:i\u00ED|í|ia|ía|Ã\u00eda)/g,'Dhanya');
+        if(r!==s) n.nodeValue=r;
+      }
+      function sweep(root){
+        if(!root) return;
+        if(root.nodeType===Node.TEXT_NODE){ replaceInTextNode(root); return; }
+        var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+        var node; while((node=w.nextNode())) replaceInTextNode(node);
+      }
+      function findByText(text, scope){
+        var w=document.createTreeWalker(scope||document.body,NodeFilter.SHOW_ELEMENT);
+        var node; text=(text||'').toLowerCase();
+        while((node=w.nextNode())){
+          if(node && node.textContent && node.textContent.toLowerCase().includes(text)) return node;
+        }
+        return null;
+      }
+      function injectEvents(){
+        var markers=['Aperitivo','APERITIVO','Vini della Tenuta','Primo','Secondo','Dolce'];
+        var anchors=markers.map(m=>findByText(m)).filter(Boolean);
+        if(anchors.length===0) return;
+        var ref=anchors[0];
+        function findCard(n){
+          var keys=['aperitivo','primo','secondo','dolce','vini della tenuta','bruschetta','risotto','filetto'];
+          var cur=n;
+          for(var d=0; d<6 && cur; d++){
+            var tag=(cur.tagName||'').toLowerCase();
+            if(tag==='body'||tag==='main'||tag==='html'||(cur.id||'')==='root') return null;
+            var txt=(cur.textContent||'').toLowerCase();
+            var hits=0; for(var i=0;i<keys.length;i++){ if(txt.indexOf(keys[i])>-1) hits++; }
+            if(hits>=3 && txt.length<1200) return cur;
+            cur=cur.parentElement;
+          }
+          return null;
+        }
+        var card=findCard(ref);
+        if(!card || card.getAttribute('data-events-injected')==='1') return;
+        var html=[
+          '<div class=\"text-center mb-6\"><h2 class=\"font-display text-base tracking-widest uppercase\" style=\"color:#5C2018\">Events</h2></div>',
+          '<div class=\"text-center mb-5\"><h3 class=\"font-display text-sm tracking-widest uppercase mb-1\" style=\"color:#5C2018\">Rang Jo Lagyo — “Mehendi”</h3><p class=\"font-body text-xs\" style=\"color:#5C2018\">Malepurath House</p><p class=\"font-body text-[10px] italic\" style=\"color:#5C2018\">11th September 2026 • 3:00 PM</p></div>',
+          '<div class=\"text-center mb-5\"><h3 class=\"font-display text-sm tracking-widest uppercase mb-1\" style=\"color:#5C2018\">Tal Se Taal Mila — “Podva & Sangeet”</h3><p class=\"font-body text-xs\" style=\"color:#5C2018\">Malepurath House</p><p class=\"font-body text-[10px] italic\" style=\"color:#5C2018\">12th September 2026 • 5:00 PM</p></div>',
+          '<div class=\"text-center mb-5\"><h3 class=\"font-display text-sm tracking-widest uppercase mb-1\" style=\"color:#5C2018\">Saat Phere — “Wedding”</h3><p class=\"font-body text-xs\" style=\"color:#5C2018\">Akhil Convention Centre</p><p class=\"font-body text-[10px] italic\" style=\"color:#5C2018\">13th September 2026 • 10:00 AM</p></div>',
+          '<div class=\"text-center mb-2\"><h3 class=\"font-display text-sm tracking-widest uppercase mb-1\" style=\"color:#5C2018\">Reception</h3><p class=\"font-body text-xs\" style=\"color:#5C2018\">Kollam, Kerala</p><p class=\"font-body text-[10px] italic\" style=\"color:#5C2018\">13th September 2026 • 5:00 PM</p></div>'
+        ].join('');
+        var wrapper=document.createElement('div');
+        wrapper.className='space-y-4 py-4';
+        wrapper.innerHTML=html;
+        card.parentElement && card.parentElement.insertBefore(wrapper, card);
+        card.style.display='none';
+        card.setAttribute('data-events-injected','1');
+      }
+      function init(){ sweep(document.body); injectEvents(); }
+      document.addEventListener('DOMContentLoaded', init);
+      var mo=new MutationObserver(function(){
+        sweep(document.body); injectEvents();
+      });
+      mo.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+      var n=0, iv=setInterval(function(){ init(); if(++n>20) clearInterval(iv); },250);
+    })();
+  </script>
 </body>
 </html>
