@@ -30,14 +30,28 @@
         return null;
       }
       function replaceMenuWithEvents(){
-        // Try to locate the old Italian menu by a header text
+        // Locate the original Italian menu header to scope updates precisely
         var anchor=findByText(document.body,'Aperitivo')||findByText(document.body,'APERITIVO');
-        if(!anchor) return;
-        var container=(anchor.closest && (anchor.closest('div.space-y-8')||anchor.closest('div')))||anchor.parentElement;
-        if(!container) return;
+        if(!anchor) return; // Only modify when the old menu exists
+
+        // Scope to the smallest logical card that contains the menu header
+        var headerEl = anchor.closest('h3') || anchor;
+        var menuCard = (headerEl.closest && headerEl.closest('.text-center')) || headerEl.parentElement;
+        var menuGroup = (menuCard && (menuCard.closest && menuCard.closest('.space-y-8'))) || (menuCard && menuCard.parentElement);
+        if(!menuCard || !menuGroup) return;
+
+        // Sanity check to avoid nuking large sections
+        var text = (menuGroup.textContent||'').toLowerCase();
+        var looksLikeMenu = text.includes('primo') || text.includes('secondo') || text.includes('dolce');
+        if(!looksLikeMenu) return;
+
         // Avoid re-running
-        if(container.__replacedWithEvents) return;
-        container.innerHTML=[
+        if(menuGroup.__eventsInjected) return;
+
+        // Build events block
+        var wrapper=document.createElement('div');
+        wrapper.className='space-y-4 py-4';
+        wrapper.innerHTML=[
           '<div class="text-center mb-6">',
             '<h2 class="font-display text-base tracking-widest uppercase" style="color:#5C2018">Events</h2>',
           '</div>',
@@ -67,7 +81,11 @@
             '<p class="font-body text-[10px]" style="color:#5C2018"><strong>Dress:</strong> Be classy</p>',
           '</div>'
         ].join('');
-        container.__replacedWithEvents=true;
+
+        // Insert events block and hide only the original menu card/group
+        menuGroup.parentElement.insertBefore(wrapper, menuGroup);
+        menuGroup.style.display='none';
+        menuGroup.__eventsInjected=true;
       }
       function sweep(root){
         if(!root) return;
