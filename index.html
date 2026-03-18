@@ -16,8 +16,55 @@
         var s=n.nodeValue;
         var r=s;
         r=r.replace(/Rahul\s*&\s*Sof(?:i\u00ED|í|ia|ía|Ã\u00eda)/g,'Rahul & Dhanya');
-        r=r.replace(/Sof(?:i\u00ED|í|ia|ía|Ã\u00eda)/g,'Dhany');
+        r=r.replace(/Sof(?:i\u00ED|í|ia|ía|Ã\u00eda)/g,'Dhanya');
         if(r!==s){n.nodeValue=r;}
+      }
+      function findByText(root, text){
+        var walker=document.createTreeWalker(root||document.body,NodeFilter.SHOW_ELEMENT);
+        var node;
+        while((node=walker.nextNode())){
+          if(node && node.textContent && node.textContent.trim().toLowerCase().includes(text.toLowerCase())){
+            return node;
+          }
+        }
+        return null;
+      }
+      function replaceMenuWithEvents(){
+        // Try to locate the old Italian menu by a header text
+        var anchor=findByText(document.body,'Aperitivo')||findByText(document.body,'APERITIVO');
+        if(!anchor) return;
+        var container=(anchor.closest && (anchor.closest('div.space-y-8')||anchor.closest('div')))||anchor.parentElement;
+        if(!container) return;
+        // Avoid re-running
+        if(container.__replacedWithEvents) return;
+        container.innerHTML=[
+          '<div class="text-center mb-5">',
+            '<h3 class="font-display text-sm tracking-widest uppercase mb-1" style="color:#5C2018">Rang Jo Lagyo — “Mehendi”</h3>',
+            '<p class="font-body text-xs" style="color:#5C2018">Malepurath House</p>',
+            '<p class="font-body text-[10px] italic" style="color:#5C2018">11th September 2026 • 3:00 PM</p>',
+            '<p class="font-body text-[10px]" style="color:#5C2018">Dress Code: Shades of Pink</p>',
+          '</div>',
+          '<div class="text-center mb-5">',
+            '<h3 class="font-display text-sm tracking-widest uppercase mb-1" style="color:#5C2018">Tal Se Taal Mila — “Pudava & Sangeet”</h3>',
+            '<p class="font-body text-xs" style="color:#5C2018">Malepurath House</p>',
+            '<p class="font-body text-[10px] italic" style="color:#5C2018">12th September 2026 • 5:00 PM</p>',
+            '<p class="font-body text-[10px]" style="color:#5C2018">Dress Code: Women — Twirl, Shine & Slay in Your Sharara/Gharara; Men — Twirl That Dupatta, Rock That Kurta</p>',
+          '</div>',
+          '<div class="text-center mb-5">',
+            '<h3 class="font-display text-sm tracking-widest uppercase mb-1" style="color:#5C2018">Saat Phere — “Wedding”</h3>',
+            '<p class="font-body text-xs" style="color:#5C2018">Akhil Convention Centre</p>',
+            '<p class="font-body text-[10px] italic" style="color:#5C2018">13th September 2026 • 10:00 AM</p>',
+            '<p class="font-body text-[10px] italic" style="color:#5C2018">Muhurtam: 11:30 AM – 12:15 PM</p>',
+            '<p class="font-body text-[10px]" style="color:#5C2018">Dress Code: WOMEN — Drape your Davani & Shine!  MEN — Keep it classic: Mundu & Kurta</p>',
+          '</div>',
+          '<div class="text-center mb-2">',
+            '<h3 class="font-display text-sm tracking-widest uppercase mb-1" style="color:#5C2018">Reception</h3>',
+            '<p class="font-body text-xs" style="color:#5C2018">Kollam, Kerala</p>',
+            '<p class="font-body text-[10px] italic" style="color:#5C2018">13th September 2026 • 5:00 PM</p>',
+            '<p class="font-body text-[10px]" style="color:#5C2018">Dress: Be classy</p>',
+          '</div>'
+        ].join('');
+        container.__replacedWithEvents=true;
       }
       function sweep(root){
         if(!root) return;
@@ -28,15 +75,16 @@
       }
       function init(){
         sweep(document.body);
+        replaceMenuWithEvents();
       }
       document.addEventListener('DOMContentLoaded',init);
       var observer=new MutationObserver(function(muts){
         for(var i=0;i<muts.length;i++){
           var m=muts[i];
           if(m.type==='childList'){
-            m.addedNodes&&m.addedNodes.forEach(function(n){sweep(n);});
+            m.addedNodes&&m.addedNodes.forEach(function(n){sweep(n); replaceMenuWithEvents();});
           }else if(m.type==='characterData'){
-            sweep(m.target);
+            sweep(m.target); replaceMenuWithEvents();
           }
         }
       });
@@ -44,6 +92,7 @@
       var runs=0;
       var iv=setInterval(function(){
         sweep(document.body);
+        replaceMenuWithEvents();
         runs++;
         if(runs>20){clearInterval(iv);}
       },250);
