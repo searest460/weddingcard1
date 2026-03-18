@@ -10,18 +10,44 @@
 <body>
   <div id="root"></div>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      var node;
-      while ((node = walker.nextNode())) {
-        if (node.nodeValue && node.nodeValue.indexOf('Rahul & Sofía') !== -1) {
-          node.nodeValue = node.nodeValue.replace('Rahul & Sofía', 'Rahul & Dhanya');
-        }
-        if (node.nodeValue && /Sofi[a\u00ED][a]?/i.test(node.nodeValue)) {
-          node.nodeValue = node.nodeValue.replace(/Sofi[a\u00ED][a]?/gi, 'Dhanya');
-        }
+    (function(){
+      function replaceInTextNode(n){
+        if(!n || !n.nodeValue) return;
+        var s=n.nodeValue;
+        var r=s;
+        r=r.replace(/Rahul\s*&\s*Sof(?:i\u00ED|í|ia|ía|Ã\u00eda)/g,'Rahul & Dhanya');
+        r=r.replace(/Sof(?:i\u00ED|í|ia|ía|Ã\u00eda)/g,'Dhanya');
+        if(r!==s){n.nodeValue=r;}
       }
-    });
+      function sweep(root){
+        if(!root) return;
+        if(root.nodeType===Node.TEXT_NODE){replaceInTextNode(root);return;}
+        var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+        var node;
+        while((node=walker.nextNode())){replaceInTextNode(node);}
+      }
+      function init(){
+        sweep(document.body);
+      }
+      document.addEventListener('DOMContentLoaded',init);
+      var observer=new MutationObserver(function(muts){
+        for(var i=0;i<muts.length;i++){
+          var m=muts[i];
+          if(m.type==='childList'){
+            m.addedNodes&&m.addedNodes.forEach(function(n){sweep(n);});
+          }else if(m.type==='characterData'){
+            sweep(m.target);
+          }
+        }
+      });
+      observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+      var runs=0;
+      var iv=setInterval(function(){
+        sweep(document.body);
+        runs++;
+        if(runs>20){clearInterval(iv);}
+      },250);
+    })();
   </script>
 </body>
 </html>
