@@ -9,5 +9,19 @@
 </head>
 <body>
   <div id="root"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      var node;
+      while ((node = walker.nextNode())) {
+        if (node.nodeValue && node.nodeValue.indexOf('Rahul & Sofía') !== -1) {
+          node.nodeValue = node.nodeValue.replace('Rahul & Sofía', 'Rahul & Dhanya');
+        }
+        if (node.nodeValue && /Sofi[a\u00ED][a]?/i.test(node.nodeValue)) {
+          node.nodeValue = node.nodeValue.replace(/Sofi[a\u00ED][a]?/gi, 'Dhanya');
+        }
+      }
+    });
+  </script>
 </body>
 </html>
